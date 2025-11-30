@@ -17,7 +17,7 @@ export default function Register() {
   };
 
   // handle submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -29,6 +29,18 @@ export default function Register() {
 
     // API call example:
     // axios.post('/register', formData)
+    const res = await fetch('http://localhost:3000/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData),
+  });
+
+  const body = await res.json();
+  if (res.ok) {
+    console.log('Registered:', body);
+  } else {
+    console.error('Error:', body);
+  }
   };
 
   return (
