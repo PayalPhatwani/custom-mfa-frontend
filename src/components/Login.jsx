@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit =  async (e) => {
     e.preventDefault();
 
     const loginData = {
@@ -14,9 +15,27 @@ export default function Login() {
     };
 
     console.log("Login Data:", loginData);
-
-    // Here you will call your API
     // axios.post('/login', loginData)
+    try {
+      const res = await fetch("http://localhost:3000/auth/login",{
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify(loginData),
+      })
+
+      const body = await res.json()
+
+      if(res.ok){
+        console.log("loging successfull", body);
+        // redirecting to home page
+        navigate("/home");
+      }else{
+        alert(body.message || "Login Failed");
+      }
+    } catch (error) {
+      console.error("Error logging in", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (
