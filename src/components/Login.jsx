@@ -29,6 +29,7 @@ export default function Login() {
       // Storing JWT token in local storage
       if(res.ok){
       localStorage.setItem("token", data.access_token);
+      
 
       // redirect to home page
       navigate("/home");
