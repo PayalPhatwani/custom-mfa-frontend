@@ -4,9 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
-  const handleSubmit =  async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const loginData = {
@@ -15,24 +17,26 @@ export default function Login() {
     };
 
     console.log("Login Data:", loginData);
-    // axios.post('/login', loginData)
     try {
-      const res = await fetch("http://localhost:3000/auth/login",{
+      const res = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json"},
-        body: JSON.stringify(loginData),
-      })
-
-      const body = await res.json()
-
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      // Storing JWT token in local storage
       if(res.ok){
-        console.log("loging successfull", body);
-        // redirecting to home page
-        navigate("/home");
+      localStorage.setItem("token", data.access_token);
+
+      // redirect to home page
+      navigate("/home");
       }else{
-        alert(body.message || "Login Failed");
+        console.log("password or email have some issue")
       }
     } catch (error) {
+      setError("Invalid email or password");
       console.error("Error logging in", error);
       alert("Something went wrong. Please try again.");
     }
@@ -64,12 +68,15 @@ export default function Login() {
         <button type="submit" style={styles.button}>
           Login
         </button>
-         <p>
-  Don't have an account?{" "}
-  <Link to="/register" style={{ color: "#007bff", textDecoration: "none" }}>
-    Create Account
-  </Link>
-</p>
+        <p>
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            style={{ color: "#007bff", textDecoration: "none" }}
+          >
+            Create Account
+          </Link>
+        </p>
       </form>
     </div>
   );
