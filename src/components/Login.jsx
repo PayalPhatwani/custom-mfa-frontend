@@ -15,7 +15,6 @@ export default function Login() {
       email,
       password,
     };
-
     console.log("Login Data:", loginData);
     try {
       const res = await fetch("http://localhost:3000/auth/login", {
@@ -26,15 +25,19 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      // Storing JWT token in local storage
-      if(res.ok){
-      localStorage.setItem("token", data.access_token);
-      
-
-      // redirect to home page
-      navigate("/home");
-      }else{
-        console.log("password or email have some issue")
+      if(!res.ok){
+        setError(data.message || "Invalid email or password");
+        return;
+      }
+      if (data.status === "MFA_REQUIRED") {
+        //store temporary mfa token
+        localStorage.setItem("mfaToken", data.mfaToken);
+        localStorage.setItem("email", email);
+        navigate("/mfa");
+        return;
+      }
+      else {
+        console.log("password or email have some issue");
       }
     } catch (error) {
       setError("Invalid email or password");
@@ -47,7 +50,7 @@ export default function Login() {
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
         <h2 style={styles.title}>Login</h2>
-
+        {error && <p style={styles.error}>{error}</p>}
         <input
           type="email"
           placeholder="Email"
@@ -106,6 +109,14 @@ const styles = {
     textAlign: "center",
     marginBottom: "10px",
     color: "#333",
+  },
+  error: {
+    backgroundColor: "#ffdddd",
+    color: "#d00000",
+    padding: "10px",
+    borderRadius: "6px",
+    fontSize: "14px",
+    textAlign: "center",
   },
   input: {
     padding: "10px",
