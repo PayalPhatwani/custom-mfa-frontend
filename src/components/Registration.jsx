@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -7,6 +8,9 @@ export default function Register() {
     password: "",
     confirmPassword: "",
   });
+
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // handle input change
   const handleChange = (e) => {
@@ -17,36 +21,49 @@ export default function Register() {
   };
 
   // handle submit
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setSuccessMessage("");
+    setErrorMessage("");
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      setErrorMessage("Passwords do not match");
       return;
     }
 
-    console.log("Registration Data:", formData);
+    const res = await fetch("http://localhost:3000/user/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
 
-    // API call example:
-    // axios.post('/register', formData)
-    const res = await fetch('http://localhost:3000/auth/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData),
-  });
+    const body = await res.json();
 
-  const body = await res.json();
-  if (res.ok) {
-    console.log('Registered:', body);
-  } else {
-    console.error('Error:', body);
-  }
+    if (res.ok) {
+      setSuccessMessage("Registration successful! You can now login.");
+      setErrorMessage("");
+    } else {
+      setErrorMessage(body.message || "Registration failed. Try again.");
+      setSuccessMessage("");
+    }
   };
 
   return (
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
         <h2 style={styles.title}>Register</h2>
+
+        {successMessage && (
+          <div style={styles.successBox}>
+            {successMessage} <br />
+            <Link to="/login" style={{ color: "#0a58ca", fontWeight: "bold" }}>
+              Go to Login →
+            </Link>
+          </div>
+        )}
+
+        {errorMessage && <div style={styles.errorBox}>{errorMessage}</div>}
 
         <input
           type="text"
@@ -134,5 +151,21 @@ const styles = {
     border: "none",
     borderRadius: "6px",
     cursor: "pointer",
+  },
+
+  // NEW STYLES ADDED FOR MESSAGES
+  successBox: {
+    backgroundColor: "#d1e7dd",
+    color: "#0f5132",
+    padding: "10px",
+    borderRadius: "6px",
+    fontSize: "14px",
+  },
+  errorBox: {
+    backgroundColor: "#f8d7da",
+    color: "#842029",
+    padding: "10px",
+    borderRadius: "6px",
+    fontSize: "14px",
   },
 };
