@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 export default function MFA() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -29,7 +30,7 @@ export default function MFA() {
     const finalOtp = otp.join(""); // create single string like "123456"
     const email = localStorage.getItem("email");
 
-    const res = await fetch("http://localhost:3000/auth/verify-mfa", {
+    const res = await fetch(`${API_URL}/auth/verify-mfa`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

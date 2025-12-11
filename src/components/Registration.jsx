@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
@@ -32,7 +32,7 @@ export default function Register() {
       return;
     }
 
-    const res = await fetch("http://localhost:3000/user/register", {
+    const res = await fetch(`${API_URL}/user/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
